@@ -18,7 +18,8 @@ mailtool() {
         echo "$mx_records"
         echo "-----A Records-----"
         echo "$(dig @8.8.8.8 $(dig @8.8.8.8 mx $_domain +short) +short)"
-    }
+        fi
+
 
     # Check for SPF record
     spf_record=$(dig @8.8.8.8 txt $_domain +short)
@@ -27,7 +28,8 @@ mailtool() {
     else
         echo "-----SPF-----"
         echo "$spf_record"
-    }
+    fi
+
 
     # Check for DKIM record
     dkim_record=$(dig @8.8.8.8 txt default._domainkey.$_domain +short)
@@ -36,7 +38,8 @@ mailtool() {
     else
         echo "-----DKIM-----"
         echo "$dkim_record"
-    }
+        fi
+
 
     # Check for DMARC record
     dmarc_record=$(dig @8.8.8.8 txt _dmarc.$_domain +short)
@@ -45,8 +48,8 @@ mailtool() {
     else
         echo "-----DMARC-----"
         echo "$dmarc_record"
-    }
-}
+    fi
+        }
 
   # Call the function to check DNS records
   check_dns_records
@@ -59,13 +62,14 @@ mailtool() {
     else
         echo "The domain is not using Local Mail Delivery!"
     fi
-  } 
-  
+  }
+
   > $output_file 2>&1
 
   # Print a notification in the terminal
   echo "Output redirected to: $output_file" > /dev/tty
 }
+
 
 
 

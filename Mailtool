@@ -1,8 +1,7 @@
-#Mail look-up tool -per-site-basis
 mailtool() {
   domain=$1
   output_file="~/mailtool-$(date +%m-%d-%yT%H:%M).txt"
-
+        {
   # Define a function to check DNS records
   check_dns_records() {
     echo "Checking DNS records for domain $domain..."
@@ -23,7 +22,7 @@ mailtool() {
     if [ -z "$spf_record" ]; then
         echo "SPF record is missing for $domain!"
     else
-        echo "-----SPF-----"
+        echo "-----SPF Record-----"
         echo "$spf_record"
     fi
 
@@ -32,7 +31,7 @@ mailtool() {
     if [ -z "$dkim_record" ]; then
         echo "DKIM record is missing for $domain!"
     else
-        echo "-----DKIM-----"
+        echo "-----DKIM Record-----"
         echo "$dkim_record"
     fi
 
@@ -41,14 +40,16 @@ mailtool() {
     if [ -z "$dmarc_record" ]; then
         echo "DMARC record is missing for $domain!"
     else
-        echo "-----DMARC-----"
+        echo "-----DMARC Record-----"
         echo "$dmarc_record"
     fi
-  }
+ }
 
   # Call the function to check DNS records
+  echo -e "\n============================\n"
   check_dns_records
 
+  echo -e "\n============================\n"
   # Check if site is using Local Mail Delivery (LMD)
   grep $domain /var/qmail/control/virtualdomains | wc -l | {
     read count
@@ -58,13 +59,10 @@ mailtool() {
         echo "The domain is not using Local Mail Delivery!"
     fi
   }
+  echo -e "\n============================\n"
 
-  > $output_file 2>&1
+        }> ~/mailtool-$(date +%m-%d-%yT%H:%M).txt # Redirect the function output to a file
 
   # Print a notification in the terminal
   echo "Output redirected to: $output_file" > /dev/tty
 }
-
-
-
-

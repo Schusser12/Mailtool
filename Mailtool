@@ -1,61 +1,56 @@
 #Mail look-up tool -per-site-basis
 mailtool() {
+  domain=$1
   output_file="~/mailtool-$(date +%m-%d-%yT%H:%M).txt"
-
-  # Get domain name
-  _domain=$(sup_getdomain)
 
   # Define a function to check DNS records
   check_dns_records() {
-    echo "Checking DNS records for domain $_domain..."
+    echo "Checking DNS records for domain $domain..."
 
     # Check for MX records
-    mx_records=$(dig @8.8.8.8 mx $_domain +short)
+    mx_records=$(dig @8.8.8.8 mx $domain +short)
     if [ -z "$mx_records" ]; then
-        echo "MX records are missing for $_domain!"
+        echo "MX records are missing for $domain!"
     else
         echo "-----MX Records-----"
         echo "$mx_records"
         echo "-----A Records-----"
-        echo "$(dig @8.8.8.8 $(dig @8.8.8.8 mx $_domain +short) +short)"
-        fi
-
+        echo "$(dig @8.8.8.8 $(dig @8.8.8.8 mx $domain +short) +short)"
+    fi
 
     # Check for SPF record
-    spf_record=$(dig @8.8.8.8 txt $_domain +short)
+    spf_record=$(dig @8.8.8.8 txt $domain +short)
     if [ -z "$spf_record" ]; then
-        echo "SPF record is missing for $_domain!"
+        echo "SPF record is missing for $domain!"
     else
         echo "-----SPF-----"
         echo "$spf_record"
     fi
 
-
     # Check for DKIM record
-    dkim_record=$(dig @8.8.8.8 txt default._domainkey.$_domain +short)
+    dkim_record=$(dig @8.8.8.8 txt default._domainkey.$domain +short)
     if [ -z "$dkim_record" ]; then
-        echo "DKIM record is missing for $_domain!"
+        echo "DKIM record is missing for $domain!"
     else
         echo "-----DKIM-----"
         echo "$dkim_record"
-        fi
-
+    fi
 
     # Check for DMARC record
-    dmarc_record=$(dig @8.8.8.8 txt _dmarc.$_domain +short)
+    dmarc_record=$(dig @8.8.8.8 txt _dmarc.$domain +short)
     if [ -z "$dmarc_record" ]; then
-        echo "DMARC record is missing for $_domain!"
+        echo "DMARC record is missing for $domain!"
     else
         echo "-----DMARC-----"
         echo "$dmarc_record"
     fi
-        }
+  }
 
   # Call the function to check DNS records
   check_dns_records
 
   # Check if site is using Local Mail Delivery (LMD)
-  grep $_domain /var/qmail/control/virtualdomains | wc -l | {
+  grep $domain /var/qmail/control/virtualdomains | wc -l | {
     read count
     if [ $count -eq 1 ]; then
         echo "The domain is using Local Mail Delivery!"
@@ -69,7 +64,6 @@ mailtool() {
   # Print a notification in the terminal
   echo "Output redirected to: $output_file" > /dev/tty
 }
-
 
 
 

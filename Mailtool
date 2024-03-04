@@ -1,0 +1,23 @@
+#Mail look-up tool -per-site-basis
+mailtool() {
+  output_file="~/mailtool-$(date +%m-%d-%yT%H:%M).txt"
+  {
+    # Get domain name
+    _domain=$(sup_getdomain)
+
+    # Check if site is using Local Mail Delivery (LMD)
+    grep $_domain /var/qmail/control/virtualdomains | wc -l | {
+        read count
+        if [ $count -eq 1 ]; then
+            echo "The domain is using Local Mail Delivery!"
+        else
+            echo "The domain is not using Local Mail Delivery!"
+        fi
+    }
+
+  
+  } > $output_file 2>&1 # Redirect the function output to the specified file
+
+  # Print a notification in the terminal
+  echo "Output redirected to: $output_file" > /dev/tty
+}

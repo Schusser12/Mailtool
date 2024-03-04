@@ -1,3 +1,4 @@
+#Quick mail investigation result |ZAnders original ☞ ͡° ͜ʖ ͡°)☞ |
 mailtool() {
   domain=$1
   output_file="~/mailtool-$(date +%m-%d-%yT%H:%M).txt"
@@ -79,12 +80,6 @@ mailtool() {
         cat /var/log/smtp/current 2>/dev/null | tai64nlocal | grep $domain | tail -30
         echo -e "\n============================\n"
 
-        # Call the bs_iprep2 function at the end of the mailtool function
-        #echo "Server IP reputation check:"
-        #echo -e "\n"
-#
- #      bs_iprep2
-#
         }> ~/mailtool-$(date +%m-%d-%yT%H:%M).txt # Redirect the function output to a file
 
   # Print a notification in the terminal

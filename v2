@@ -1,3 +1,4 @@
+#Quick mail investigation result |ZAnders original ☞ ͡° ͜ʖ ͡°)☞ |
 mailtool() {
   domain=$1
   output_file="~/mailtool-$(date +%m-%d-%yT%H:%M).txt"

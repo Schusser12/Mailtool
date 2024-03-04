@@ -1,0 +1,2 @@
+# Mailtool
+Basic mail investigation

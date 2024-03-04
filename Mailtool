@@ -6,47 +6,47 @@ mailtool() {
     _domain=$(sup_getdomain)
 
     # Define a function to check DNS records
-    check_dns_records() {
-    echo "Checking DNS records for domain $domain..."
+   check_dns_records() {
+    echo "Checking DNS records for domain $_domain..."
 
-         # Check for MX records
-      mx_records=$(dig @8.8.8.8 mx $_domain +short)
-      if [ -z "$mx_records" ]; then
-          echo "MX records are missing for $_domain!"
-      else
-          echo "-----MX Records-----"
-          echo "$mx_records"
-          echo "-----A Records-----"
-          echo "$(dig @8.8.8.8 $(dig @8.8.8.8 mx $_domain +short) +short)"
-      fi
-
-      # Check for SPF record
-      spf_record=$(dig @8.8.8.8 txt $_domain +short)
-      if [ -z "$spf_record" ]; then
-          echo "SPF record is missing for $_domain!"
-      else
-          echo "-----SPF-----"
-          echo "$spf_record"
-      fi
-
-      # Check for DKIM record
-      dkim_record=$(dig @8.8.8.8 txt default._domainkey.$_domain +short)
-      if [ -z "$dkim_record" ]; then
-          echo "DKIM record is missing for $_domain!"
-      else
-          echo "-----DKIM-----"
-          echo "$dkim_record"
-      }
-
-      # Check for DMARC record
-      dmarc_record=$(dig @8.8.8.8 txt _dmarc.$_domain +short)
-      if [ -z "$dmarc_record" ]; then
-          echo "DMARC record is missing for $_domain!"
-      else
-          echo "-----DMARC-----"
-          echo "$dmarc_record"
-      }
+    # Check for MX records
+    mx_records=$(dig @8.8.8.8 mx $_domain +short)
+    if [ -z "$mx_records" ]; then
+        echo "MX records are missing for $_domain!"
+    else
+        echo "-----MX Records-----"
+        echo "$mx_records"
+        echo "-----A Records-----"
+        echo "$(dig @8.8.8.8 $(dig @8.8.8.8 mx $_domain +short) +short)"
     }
+
+    # Check for SPF record
+    spf_record=$(dig @8.8.8.8 txt $_domain +short)
+    if [ -z "$spf_record" ]; then
+        echo "SPF record is missing for $_domain!"
+    else
+        echo "-----SPF-----"
+        echo "$spf_record"
+    }
+
+    # Check for DKIM record
+    dkim_record=$(dig @8.8.8.8 txt default._domainkey.$_domain +short)
+    if [ -z "$dkim_record" ]; then
+        echo "DKIM record is missing for $_domain!"
+    else
+        echo "-----DKIM-----"
+        echo "$dkim_record"
+    }
+
+    # Check for DMARC record
+    dmarc_record=$(dig @8.8.8.8 txt _dmarc.$_domain +short)
+    if [ -z "$dmarc_record" ]; then
+        echo "DMARC record is missing for $_domain!"
+    else
+        echo "-----DMARC-----"
+        echo "$dmarc_record"
+    }
+}
 
     # Call the function to check DNS records
     check_dns_records

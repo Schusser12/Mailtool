@@ -1,0 +1,52 @@
+function bs_IPREP (){
+    DOMAINS_CHECK=$(curl -s http://spamwars.nexcess.net/public/pdomains.txt)
+    SWAKS=$(which swaks)
+    HOST=$(hostname)
+    RBLS=$(curl -s http://spamwars.nexcess.net/public/rbls.txt)
+
+    VIRTUALBS=$(cat /proc/cpuinfo | grep hyper | wc -l)
+    if [[ $VIRTUALBS -gt "0" ]]; then
+        echo "Cloudhost"
+        LISTIPS=$(ip addr show | grep "inet " | cut -d"/" -f1 | cut -d" " -f6 | grep -vE "^127\.0\.|^172\." | head -n1)
+    else
+        echo "Non Cloudhost"
+        LISTIPS=$(ip addr show | grep "inet " | cut -d"/" -f1 | cut -d" " -f6 | grep -vE "^127\.0\.|^172\.|^10\.")
+    fi
+
+    for x in $LISTIPS; do
+        realIP=$(curl --silent https://spamwars.nexcess.net/public/ip/)
+        for b in $DOMAINS_CHECK; do
+            CHECK=$($SWAKS -qTO -t postmaster@$b -li $x 2>> /dev/null | sed -r 's/^.{4}//' | grep -E '^5|^4')
+            if [ ! -z "$CHECK" ]; then
+                echo $b
+                echo $CHECK
+                echo "IP $realIP is LISTED with $b"
+                curl --data "type=private&domain=$b&ip=$realIP&status=$CHECK&host=$HOST" https://spamwars.nexcess.net/public/capture.php
+            fi
+        done
+
+        CHECKGMAIL=$($SWAKS -4 -t iflcars.com@gmail.com -li $x | sed -r 's/^.{4}//' | grep -E '^5|^4')
+        if [ ! -z "$CHECKGMAIL" ]; then
+            echo "Gmail"
+            echo $CHECKGMAIL
+            echo "IP $realIP is LISTED with Gmail"
+            curl --data "type=private&domain=gmail.com&ip=$realIP&status=$CHECKGMAIL&host=$HOST" http://spamwars.nexcess.net/public/capture.php
+        fi
+
+        for r in $RBLS; do
+            LOOKUP="$(echo $realIP | awk -F. '{print $4"."$3"."$2"."$1}').$r"
+            LISTED=$(dig +time=2 +tries=2 +short $LOOKUP | grep -v \;)
+            REASON=$(dig +time=1 +tries=1 +short txt $LOOKUP | grep -v \;)
+            if [ ! -z "$LISTED" ]; then
+                echo "IP $realIP is LISTED with $r"
+                curl --data "type=rbl&domain=$r&ip=$realIP&status=$REASON&host=$HOST" http://spamwars.nexcess.net/public/capture.php
+            fi
+        done
+
+        echo
+        echo "PHONE: 866-639-2377"
+        echo -n "rDNS: "
+        dig @8.8.8.8 -x $realIP +short
+        echo "https://spamwars.nexcess.net/private/blacklist.php?select=ip&order=$realIP"
+    done
+}

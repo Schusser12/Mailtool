@@ -19,7 +19,7 @@ mailtool() {
     fi
 
     # Check for SPF record
-    spf_record=$(dig @8.8.8.8 txt $domain +short)
+    spf_record=$(dig @8.8.8.8 txt $domain +short | grep "spf")
     if [ -z "$spf_record" ]; then
         echo "SPF record is missing for $domain!"
     else
